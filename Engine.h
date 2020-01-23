@@ -9,7 +9,6 @@ class Engine
 private:
 
     RenderWindow Window;
-
     // ќбъ€вл€ем спрайт и текстуру дл€ фона
     Sprite BackgroundSprite;
     Texture BackgroundTexture;

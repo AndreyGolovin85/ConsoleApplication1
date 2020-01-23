@@ -10,8 +10,10 @@ Engine::Engine()
     Vector2f resolution;
     resolution.x = VideoMode::getDesktopMode().width;
     resolution.y = VideoMode::getDesktopMode().height;
+    resolution.x = 800;
+    resolution.y = 600;
 
-    Window.create(VideoMode(800, 600), "Panic in the Pizzeria");
+    Window.create(VideoMode(resolution.x, resolution.y), "Panic in the Pizzeria");
 
     // Загружаем фон в текстуру
     BackgroundTexture.loadFromFile("image/wall.jpg");

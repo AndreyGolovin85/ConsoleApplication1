@@ -14,7 +14,7 @@ private:
     Sprite Chef_Sprite;
 
     // Добавляем текстуру и загружаем картинку повара.
-    Image image_m;
+    Image image_Chef;
     Texture image_Texture;
 
     // Скорость повара в пикселях в секунду
@@ -29,6 +29,4 @@ public:
     // Для отправки спрайта в главную функцию
     Sprite getSprite();
 
-    // Эта функция будет вызываться на каждый кадр
-    void update(float elapsedTime);
 };

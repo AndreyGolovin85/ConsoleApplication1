@@ -5,10 +5,9 @@ using namespace sf;
 
 Pan::Pan()
 {
-   
     Speed_Pan = 300;     // Переменная скорости сковороды.
     Pan_Position.x = 380;// Переменная x  сковороды.
-    Pan_Position.y = 575;// Переменная y сковороды.
+    Pan_Position.y = 576;// Переменная y сковороды.
 
     //Загружаем изображение и связываем текстуру и спрайт.
     Pan_Image.loadFromFile("image/pan1.bmp");
@@ -18,7 +17,6 @@ Pan::Pan()
     Pan_Sprite.setTexture(Pan_Texture);
     Pan_Sprite.setPosition(Pan_Position);//(380, 552);
     Pan_Sprite.setOrigin(Pan_Sprite.getTextureRect().width/2 , Pan_Sprite.getTextureRect().height/2);
-
 }
     Sprite Pan::getSprite()
     {
@@ -49,8 +47,8 @@ Pan::Pan()
     // прошедшего времени и скорости
     void Pan::update(float elapsedTime)
     {
-        if (Pan_Sprite.getPosition().x > 760)                                   // Проверяем 
-            Pan_Sprite.setPosition(800, Pan_Sprite.getPosition().y);     // Достигла ли сковорда
+        if (Pan_Sprite.getPosition().x > 762)                                   // Проверяем 
+            Pan_Sprite.setPosition(800, Pan_Sprite.getPosition().x);     // Достигла ли сковорда
         else                                                                                // Правого края экрана, если да то сковорда останавливается.
 
         if (RightPressed)
@@ -58,8 +56,8 @@ Pan::Pan()
             Pan_Position.x += Speed_Pan * elapsedTime;                 // К позиции сковороды прибавляем скоррость умноженную на время.
         }
 
-        if (Pan_Sprite.getPosition().x < 40)                                        //  аналогично только в лево
-            Pan_Sprite.setPosition(0, Pan_Sprite.getPosition().y);
+        if (Pan_Sprite.getPosition().x < 38)                                        //  аналогично только в лево
+            Pan_Sprite.setPosition(0, Pan_Sprite.getPosition().x);
         else
 
         if (LeftPressed)
@@ -67,6 +65,6 @@ Pan::Pan()
             Pan_Position.x -= Speed_Pan * elapsedTime;
         }
 
-        // Теперь сдвигаем спрайт на новую позицию
+        // Сдвигаем спрайт на новую позицию
         Pan_Sprite.setPosition(Pan_Position);
     }

@@ -8,10 +8,10 @@ Chef::Chef()
     Speed_Chef = 10;
 
     //Загружаем изображение и связываем текстуру и спрайт.
-    image_m.loadFromFile("image/chef.bmp");
-    image_m.createMaskFromColor( image_m.getPixel(0, 0));       // Удаляем синий фон картинки
+    image_Chef.loadFromFile("image/chef.bmp");
+    image_Chef.createMaskFromColor( image_Chef.getPixel(0, 0));       // Удаляем синий фон картинки
 
-    image_Texture.loadFromImage(image_m);
+    image_Texture.loadFromImage(image_Chef);
     Chef_Sprite.setTexture(image_Texture);
     Chef_Sprite.setPosition(30, 15);
 

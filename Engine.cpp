@@ -53,6 +53,7 @@ void Engine::input()
 void Engine::update(float dtAsSeconds)
 {
     pan.update(dtAsSeconds);
+    pizza.update(dtAsSeconds);
 }
 
 void Engine::draw()
@@ -64,6 +65,8 @@ void Engine::draw()
     Window.draw(BackgroundSprite);
     // Отрисовываем повара
     Window.draw(chef.getSprite());
+    // Отрисовываем пиццу
+    Window.draw(pizza.getSprite());
     // И Сковороду
     Window.draw(pan.getSprite());
 

@@ -2,6 +2,7 @@
 #include <SFML/Graphics.hpp>
 #include "pan.h"
 #include "chef.h"
+#include "pizza.h"
 using namespace sf;
 
 class Engine
@@ -17,6 +18,8 @@ private:
     Chef chef;
     // Ёкземпл€р сковороды
     Pan pan;
+    // Ёкземпл€р пиццы
+    Pizza pizza;
 
     void input();
     void update(float dtAsSeconds);

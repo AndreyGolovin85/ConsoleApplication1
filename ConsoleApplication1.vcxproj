@@ -157,11 +157,13 @@
     <ClCompile Include="ConsoleApplication1.cpp" />
     <ClCompile Include="Engine.cpp" />
     <ClCompile Include="pan.cpp" />
+    <ClCompile Include="pizza.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="chef.h" />
     <ClInclude Include="Engine.h" />
     <ClInclude Include="pan.h" />
+    <ClInclude Include="pizza.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

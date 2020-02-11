@@ -1,39 +1,24 @@
-#pragma once
+
 #include <SFML/Graphics.hpp>
-#include "chef.h"
-using namespace sf;
 
 class Pizza
 {
-    //////////////////////////////////////////////////////////////////////////////////////////////////////
-    //Создаем класс на время, позже придумаем что и куда унаследовать с поваром.//
-    // Пока тренируемся с заголовочными файлами.                                                 //
-    ////////////////////////////////////////////////////////////////////////////////////////////////////
-    // Все private переменные могут быть доступны только внутри объекта
-private:
-
-    // Позиция повара
-    Vector2f Pizza_Position;
-
-    // Объявляем объект Sprite
-    Sprite Pizza_Sprite;
-
-    // Добавляем текстуру и загружаем картинку пиццу.
-    Image image_Pizza;
-    Texture image_Texture;
-
-    // Скорость повара в пикселях в секунду
-    float Speed_Pizza;
-
-    // Открытые методы
 public:
+	float dx, dy, x, y, speed, moveTimer;//добавили переменную таймер для будущих целей
+	int w, h;
+	Texture texture;
+	Sprite sprite;
+	String name;
 
-    // Настраиваем повара в конструкторе
-    Pizza();
-
-    // Для отправки спрайта в главную функцию
-    Sprite getSprite();
-
-    // Эта функция будет вызываться на каждый кадр
-    void update(float elapsedTime);
+	Pizza(Image& image, float x, float y, int w, int h, String Name);
+	/*{
+		//x = X; y = Y; w = W; h = H;
+		moveTimer = 0; name = Name;
+		speed = 0; dx = 0; dy = 15;
+		name = "Pizza";
+		texture.loadFromImage(image);
+		sprite.setTexture(texture);
+		sprite.setOrigin(w / 2, h / 2);
+	}*/
+	void update(float elapsedTime);
 };

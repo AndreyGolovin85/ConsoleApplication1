@@ -11,7 +11,7 @@ Engine::Engine()
     resolution.x = VideoMode::getDesktopMode().width;
     resolution.y = VideoMode::getDesktopMode().height;
     resolution.x = 800;
-    resolution.y = 600;
+    resolution.y = 600; 
 
     Window.create(VideoMode(resolution.x, resolution.y), "Panic in the Pizzeria");
 
@@ -19,6 +19,7 @@ Engine::Engine()
     BackgroundTexture.loadFromFile("image/wall.jpg");
     // Связываем спрайт и текстуру
     BackgroundSprite.setTexture(BackgroundTexture);
+  
 }
 
 void Engine::input()
@@ -53,7 +54,6 @@ void Engine::input()
 void Engine::update(float dtAsSeconds)
 {
     pan.update(dtAsSeconds);
-    pizza.update(dtAsSeconds);
 }
 
 void Engine::draw()
@@ -66,7 +66,7 @@ void Engine::draw()
     // Отрисовываем повара
     Window.draw(chef.getSprite());
     // Отрисовываем пиццу
-    Window.draw(pizza.getSprite());
+    
     // И Сковороду
     Window.draw(pan.getSprite());
 

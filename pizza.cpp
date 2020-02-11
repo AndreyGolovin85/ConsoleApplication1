@@ -1,33 +1,32 @@
 #include <SFML/Graphics.hpp>
-#include "pizza.h"
+#include <list>
 using namespace sf;
 
-Pizza::Pizza()
+class Pizza
 {
-    //Переменная скорости повара.
-    Speed_Pizza = 100;
-    //Устнавливаем начальную позицию повара в пикселях.
-    Pizza_Position.x = 52;  // Переменная x  пиццы.
-    Pizza_Position.y = 80;  // Переменная y пиццы.
+public:
+	float dx, dy, x, y, speed, moveTimer;//добавили переменную таймер для будущих целей
+	int w, h;
+	Texture texture;
+	Sprite sprite;
+	String name;
 
-    //Загружаем изображение и связываем текстуру и спрайт.
-    image_Pizza.loadFromFile("image/pizza.bmp");                             // Загружаем картинку
-    image_Pizza.createMaskFromColor(image_Pizza.getPixel(0, 0));       // Удаляем белый фон картинки
+	Pizza(Image& image, float X, float Y, int W, int H, String Name)
+	{
+		x = X; y = Y; w = W; h = H; moveTimer = 0; name = Name;
+		speed = 0; dx = 0; dy = 15;
+		name = "Pizza";
+		texture.loadFromImage(image);
+		sprite.setTexture(texture);
+		sprite.setOrigin(w / 2, h / 2);
 
-    image_Texture.loadFromImage(image_Pizza);                               // Делаем из картинки текстуру
-    Pizza_Sprite.setTexture(image_Texture);                                        // Делаем из текстуры спрайт
-    Pizza_Sprite.setPosition(Pizza_Position);                                        // Задаем начальные координаты
-}
-
-// Эту функцию надо убрать из этого места.
-void Pizza::update(float elapsedTime)
-{
-    Pizza_Position.y += Speed_Pizza * elapsedTime;          // К позиции пиццы прибавляем скоррость умноженную на время.
-
-    // Сдвигаем спрайт на новую позицию
-    Pizza_Sprite.setPosition(Pizza_Position);
-}
-Sprite Pizza::getSprite()
-{
-    return Pizza_Sprite;
-}
+	}
+	void update(float time)
+	{
+		if (y <= 700)
+		{//для персонажа с таким именем логика будет такой
+			y += (dy * time) * 20;
+			sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
+		}
+	}
+};

@@ -3,7 +3,7 @@
 #include <list>
 using namespace sf;
 
-class Pizza
+class GameObject
 {
 public:
 	float dx, dy, x, y, speed, moveTimer;//добавили переменную таймер для будущих целей
@@ -12,26 +12,69 @@ public:
 	Sprite sprite;
 	String name;
 
-	Pizza(Image& image, float X, float Y, int W, int H, String Name)
+	GameObject (Image& image, float X, float Y, int W, int H, String Name)
 	{
 		x = X; y = Y; w = W; h = H; moveTimer = 0; name = Name;
 		speed = 0; dx = 0; dy = 15;
-		name = "Pizza";
+		name = "P";
 		texture.loadFromImage(image);
 		sprite.setTexture(texture);
-		sprite.setOrigin(w / 2, h / 2);
+		sprite.setOrigin(w/2, h/2);
+	}	
+};
 
+class Pizza :public GameObject {
+public:
+
+	Pizza(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
+	{
+		
+		if (name == "Pizza") {
+			sprite.getTextureRect();
+		}
 	}
+
 	void update(float time)
 	{
-		if (y <= 700)
-		{//для персонажа с таким именем логика будет такой
+		if (y < 600)
+		{
 			y += (dy * time) * 20;
 			sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
 		}
 	}
 };
 
+class Pan :public GameObject {
+public:
+
+	Pan(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
+	{
+		if (name == "Pan") {
+			sprite.getTextureRect();//(IntRect(0, 0, w, h));
+		}
+	}
+
+	void update(float time)
+	{
+		sprite.setPosition(x+w / 2, y+h / 2); //задаем позицию спрайта в место его центра
+	}
+};
+
+class Chef :public GameObject {
+public:
+
+	Chef(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
+	{
+		if (name == "Chef") {
+			sprite.getTextureRect();
+		}
+	}
+
+	void update(float time)
+	{
+		sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
+	}
+};
 
 int main()
 {
@@ -39,12 +82,37 @@ int main()
 	ShowWindow(hConsole, SW_HIDE);//прячем окно консоли
 
 	// Объект, который, собственно, является главным окном приложения
+	
 	RenderWindow window(VideoMode(800, 600), "Panic in the Pizzeria");
+	Image imageBG_1, imageBG_2;
+	Texture textureBG_1, textureBG_2;
+	Sprite spriteBG_1, spriteBG_2;
+	imageBG_1.loadFromFile("image/wall01.jpg");
+	imageBG_2.loadFromFile("image/wall0.jpg");
+	textureBG_1.loadFromImage(imageBG_1);//передаем в него объект Image (изображения)
+	textureBG_2.loadFromImage(imageBG_2);
+	spriteBG_1.setTexture(textureBG_1);//передаём в него объект Texture (текстуры)
+	spriteBG_2.setTexture(textureBG_2);
+	spriteBG_1.setPosition(0, 0);//задаем начальные координаты появления спрайта
+	spriteBG_2.setPosition(0, 126);
 
+	Image ChefImage;
+	ChefImage.loadFromFile("image/chef.bmp");
+	ChefImage.createMaskFromColor(ChefImage.getPixel(0, 0));
+	Chef easyChef(ChefImage, 400, 10, 50, 50, "Chef");//пицца, объект класса пицца
+
+	Image PanImage;
+	PanImage.loadFromFile("image/pan1.bmp");
+	PanImage.createMaskFromColor(PanImage.getPixel(0, 0));
+	Pan easyPan(PanImage, 400, 551, 50, 50, "Pan");//пицца, объект класса пицца
+
+	// Загружаем нашу картинку для пиццы.
 	Image PizzaImage;
 	PizzaImage.loadFromFile("image/pizza.bmp");//загрузка изображения пиццы
 	PizzaImage.createMaskFromColor(PizzaImage.getPixel(0, 0));
 	Pizza easyPizza(PizzaImage, 400, 70, 50, 50, "Pizza");//пицца, объект класса пицца
+
+	
 
 	// Переменная времени
 	Clock clock;
@@ -68,13 +136,19 @@ int main()
 		}
 		// Установка цвета фона - белый
 		window.clear(Color::White);
+		window.draw(spriteBG_1);
+		window.draw(easyChef.sprite);
+		window.draw(spriteBG_2);
 		//easyPizza update function
+		easyChef.update(time);
 		easyPizza.update(time);
+		easyPan.update(time);
+		
 		// Отрисовка спрайта
 		window.draw(easyPizza.sprite);
+		window.draw(easyPan.sprite);
 		// Отрисовка окна
 		window.display();
 	}
-
 	return 0;
 }

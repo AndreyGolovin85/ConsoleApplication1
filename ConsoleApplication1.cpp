@@ -6,7 +6,7 @@ using namespace sf;
 class GameObject
 {
 public:
-	float dx, dy, x, y, speed, moveTimer;//добавили переменную таймер для будущих целей
+	float  x, y, speed_Pan, speed_Pizza, moveTimer;//добавили переменную таймер для будущих целей
 	int w, h;
 	Texture texture;
 	Sprite sprite;
@@ -15,7 +15,8 @@ public:
 	GameObject (Image& image, float X, float Y, int W, int H, String Name)
 	{
 		x = X; y = Y; w = W; h = H; moveTimer = 0; name = Name;
-		speed = 0; dx = 0; dy = 15;
+		speed_Pan = 20;
+		speed_Pizza = 15;
 		name = "P";
 		texture.loadFromImage(image);
 		sprite.setTexture(texture);
@@ -38,25 +39,60 @@ public:
 	{
 		if (y < 600)
 		{
-			y += (dy * time) * 20;
-			sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
+			y += (speed_Pizza * time) * 20;
+			sprite.setPosition(x+w/2, y+h/2); //задаем позицию спрайта в место его центра
 		}
 	}
 };
 
 class Pan :public GameObject {
 public:
+	bool rightPressed;
+	bool leftPressed;
 
 	Pan(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
 		if (name == "Pan") {
-			sprite.getTextureRect();//(IntRect(0, 0, w, h));
+			sprite.getTextureRect();
 		}
 	}
-
+	// Функции движения спрайта с флагом true/false.
+	void moveRight()
+	{
+		rightPressed = true;
+	}
+	void stopRight()
+	{
+		rightPressed = false;
+	}
+	void moveLeft()
+	{
+		leftPressed = true;
+	}
+	void stopLeft()
+	{
+		leftPressed = false;
+	}
+	// Функция обновления позиции спрайта.
 	void update(float time)
 	{
-		sprite.setPosition(x+w / 2, y+h / 2); //задаем позицию спрайта в место его центра
+		if (sprite.getPosition().x > 750)                                   // Проверяем
+		{																			 // Достигла ли сковорда
+			sprite.setPosition(800, sprite.getPosition().x);			// Правого края экрана, если да то сковорда останавливается.
+		}
+		else if (rightPressed)
+		{
+			x += (speed_Pan * time) * 25;
+		}
+		if (sprite.getPosition().x < 26)
+		{
+			sprite.setPosition(0, sprite.getPosition().x);
+		}
+		else if (leftPressed)
+		{
+			x -= (speed_Pan * time) * 25;
+		}
+		sprite.setPosition(x+w/2, y+h/2); //задаем позицию спрайта
 	}
 };
 
@@ -99,7 +135,7 @@ int main()
 	Image ChefImage;
 	ChefImage.loadFromFile("image/chef.bmp");
 	ChefImage.createMaskFromColor(ChefImage.getPixel(0, 0));
-	Chef easyChef(ChefImage, 400, 10, 50, 50, "Chef");//пицца, объект класса пицца
+	Chef easyChef(ChefImage, 370, 10, 50, 50, "Chef");//пицца, объект класса пицца
 
 	Image PanImage;
 	PanImage.loadFromFile("image/pan1.bmp");
@@ -112,10 +148,10 @@ int main()
 	PizzaImage.createMaskFromColor(PizzaImage.getPixel(0, 0));
 	Pizza easyPizza(PizzaImage, 400, 70, 50, 50, "Pizza");//пицца, объект класса пицца
 
-	
-
 	// Переменная времени
 	Clock clock;
+	// Инициализация Event.
+	Event event;
 	// Главный цикл приложения: выполняется, пока открыто окно
 	while (window.isOpen())
 	{
@@ -126,25 +162,52 @@ int main()
 		// Переменная времени для игры
 		time = time / 2;
 		// Обрабатываем события в цикле
-		Event event;
+		//Event event;
 		while (window.pollEvent(event))
 		{
 			// Пользователь нажал на «крестик» и хочет закрыть окно?
 			if (event.type == Event::Closed)
+			{
 				// тогда закрываем его
 				window.close();
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Escape))
+			{
+			    window.close();
+			}
+			// Обрабатываем нажатие клавиш движения
+			if (Keyboard::isKeyPressed(Keyboard::Left))
+			{
+				easyPan.moveLeft();
+			}
+			else
+			{
+				easyPan.stopLeft();
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Right))
+			{
+				easyPan.moveRight();
+			}
+			else
+			{
+				easyPan.stopRight();
+			}
 		}
+
 		// Установка цвета фона - белый
 		window.clear(Color::White);
+		// Отрисовка верхней части фона.
 		window.draw(spriteBG_1);
+		// Отрисовка Повара.
 		window.draw(easyChef.sprite);
+		// Отрисовка нижней части фона, кирпичной стены.
 		window.draw(spriteBG_2);
-		//easyPizza update function
+		// Вызов функций обновления спрайтов.
 		easyChef.update(time);
 		easyPizza.update(time);
 		easyPan.update(time);
 		
-		// Отрисовка спрайта
+		// Отрисовка спрайта пиццы и сковороды.
 		window.draw(easyPizza.sprite);
 		window.draw(easyPan.sprite);
 		// Отрисовка окна

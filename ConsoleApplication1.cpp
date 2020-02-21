@@ -26,6 +26,8 @@ public:
 
 class Pizza :public GameObject {
 public:
+	double superSpeed = 40;
+	bool spacePressed;
 
 	Pizza(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
@@ -35,13 +37,26 @@ public:
 		}
 	}
 
+	void StartSuperSpeed()
+	{
+		spacePressed = true;
+	}
+	void StopSuperSpeed()
+	{
+		spacePressed = false;
+	}
+
 	void update(float time)
 	{
 		if (y < 600)
 		{
 			y += (speed_Pizza * time) * 20;
-			sprite.setPosition(x+w/2, y+h/2); //задаем позицию спрайта в место его центра
 		}
+		if (spacePressed)
+		{
+			y += (superSpeed * time) * 20;
+		}
+		sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
 	}
 };
 
@@ -108,17 +123,22 @@ public:
 
 	void update(float time)
 	{
+		if (sprite.getPosition().y > 35)
+		{
+			y -= (speed_Pan * time) * 10;
+			if (sprite.getPosition().y == 35)
+			{
+				y += (speed_Pan * time) * 10;
+			}
+		}
+		
 		sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
 	}
 };
 
-int main()
+void draw()
 {
-	HWND hConsole = GetConsoleWindow();//Если компилятор старый заменить на GetForegroundWindow()
-	ShowWindow(hConsole, SW_HIDE);//прячем окно консоли
-
 	// Объект, который, собственно, является главным окном приложения
-	
 	RenderWindow window(VideoMode(800, 600), "Panic in the Pizzeria");
 	Image imageBG_1, imageBG_2;
 	Texture textureBG_1, textureBG_2;
@@ -135,18 +155,18 @@ int main()
 	Image ChefImage;
 	ChefImage.loadFromFile("image/chef.bmp");
 	ChefImage.createMaskFromColor(ChefImage.getPixel(0, 0));
-	Chef easyChef(ChefImage, 370, 10, 50, 50, "Chef");//пицца, объект класса пицца
+	Chef chef(ChefImage, 370, 110, 50, 50, "Chef");//пицца, объект класса пицца
 
 	Image PanImage;
 	PanImage.loadFromFile("image/pan1.bmp");
 	PanImage.createMaskFromColor(PanImage.getPixel(0, 0));
-	Pan easyPan(PanImage, 400, 551, 50, 50, "Pan");//пицца, объект класса пицца
+	Pan pan(PanImage, 400, 551, 50, 50, "Pan");//пицца, объект класса пицца
 
 	// Загружаем нашу картинку для пиццы.
 	Image PizzaImage;
 	PizzaImage.loadFromFile("image/pizza.bmp");//загрузка изображения пиццы
 	PizzaImage.createMaskFromColor(PizzaImage.getPixel(0, 0));
-	Pizza easyPizza(PizzaImage, 400, 70, 50, 50, "Pizza");//пицца, объект класса пицца
+	Pizza pizza(PizzaImage, 400, 70, 50, 50, "Pizza");//пицца, объект класса пицца
 
 	// Переменная времени
 	Clock clock;
@@ -165,6 +185,7 @@ int main()
 		//Event event;
 		while (window.pollEvent(event))
 		{
+
 			// Пользователь нажал на «крестик» и хочет закрыть окно?
 			if (event.type == Event::Closed)
 			{
@@ -173,45 +194,61 @@ int main()
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Escape))
 			{
-			    window.close();
+				window.close();
 			}
 			// Обрабатываем нажатие клавиш движения
 			if (Keyboard::isKeyPressed(Keyboard::Left))
 			{
-				easyPan.moveLeft();
+				pan.moveLeft();
 			}
 			else
 			{
-				easyPan.stopLeft();
+				pan.stopLeft();
 			}
 			if (Keyboard::isKeyPressed(Keyboard::Right))
 			{
-				easyPan.moveRight();
+				pan.moveRight();
 			}
 			else
 			{
-				easyPan.stopRight();
+				pan.stopRight();
+			}
+			if (Keyboard::isKeyPressed(Keyboard::Space))
+			{
+				pizza.StartSuperSpeed();
+			}
+			else
+			{
+				pizza.StopSuperSpeed();
 			}
 		}
+			// Установка цвета фона - белый
+			window.clear(Color::White);
+			// Отрисовка верхней части фона.
+			window.draw(spriteBG_1);
+			// Отрисовка Повара.
+			window.draw(chef.sprite);
+			// Отрисовка нижней части фона, кирпичной стены.
+			window.draw(spriteBG_2);
+			// Вызов функций обновления спрайтов.
+			chef.update(time);
+			pizza.update(time);
+			pan.update(time);
 
-		// Установка цвета фона - белый
-		window.clear(Color::White);
-		// Отрисовка верхней части фона.
-		window.draw(spriteBG_1);
-		// Отрисовка Повара.
-		window.draw(easyChef.sprite);
-		// Отрисовка нижней части фона, кирпичной стены.
-		window.draw(spriteBG_2);
-		// Вызов функций обновления спрайтов.
-		easyChef.update(time);
-		easyPizza.update(time);
-		easyPan.update(time);
-		
-		// Отрисовка спрайта пиццы и сковороды.
-		window.draw(easyPizza.sprite);
-		window.draw(easyPan.sprite);
-		// Отрисовка окна
-		window.display();
+			// Отрисовка спрайта пиццы и сковороды.
+			window.draw(pizza.sprite);
+			window.draw(pan.sprite);
+			// Отрисовка окна
+			window.display();
 	}
+}
+
+int main()
+{
+	HWND hConsole = GetConsoleWindow();//Если компилятор старый заменить на GetForegroundWindow()
+	ShowWindow(hConsole, SW_HIDE);//прячем окно консоли
+	
+	draw();
+	
 	return 0;
 }

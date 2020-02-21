@@ -1,7 +1,12 @@
 ﻿#include <SFML/Graphics.hpp>
 #include <windows.h>
 #include <list>
+#include <ctime>
+#include <iostream>
+#include <cstdlib>
 using namespace sf;
+using namespace std;
+
 
 class GameObject
 {
@@ -114,6 +119,11 @@ public:
 class Chef :public GameObject {
 public:
 
+	int numb[11] = { 0, 59, 118, 177, 236, 295, 354, 413, 472, 531, 590 };
+	int A = 0;
+	int B = 10;
+	int num = A + rand() % ((B + 1) - A);
+
 	Chef(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
 		if (name == "Chef") {
@@ -123,6 +133,8 @@ public:
 
 	void update(float time)
 	{
+		
+		x = numb[num];
 		if (sprite.getPosition().y > 35)
 		{
 			y -= (speed_Pan * time) * 10;
@@ -245,6 +257,7 @@ void draw()
 
 int main()
 {
+	srand(time(NULL));
 	HWND hConsole = GetConsoleWindow();//Если компилятор старый заменить на GetForegroundWindow()
 	ShowWindow(hConsole, SW_HIDE);//прячем окно консоли
 	

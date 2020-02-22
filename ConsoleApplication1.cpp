@@ -11,6 +11,8 @@ using namespace std;
 class GameObject
 {
 public:
+	int numb[11] = { 0, 59, 118, 177, 236, 295, 354, 413, 472, 531, 590 };
+	int A = 0; int B = 10; int num;
 	float  x, y, speed_Pan, speed_Pizza, moveTimer;//добавили переменную таймер для будущих целей
 	int w, h;
 	Texture texture;
@@ -21,25 +23,32 @@ public:
 	{
 		x = X; y = Y; w = W; h = H; moveTimer = 0; name = Name;
 		speed_Pan = 20;
-		speed_Pizza = 15;
+		speed_Pizza = 1;
 		name = "P";
 		texture.loadFromImage(image);
 		sprite.setTexture(texture);
 		sprite.setOrigin(w/2, h/2);
-	}	
+	}
+
+	void random_number()
+	{
+			int num = A + rand() % ((B + 1) - A);
+			x = numb[num];
+	}
+	virtual void update(float time) = 0;
 };
 
 class Pizza :public GameObject {
 public:
 	double superSpeed = 40;
 	bool spacePressed;
-
+	
 	Pizza(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
-		
 		if (name == "Pizza") {
 			sprite.getTextureRect();
 		}
+		random_number();
 	}
 
 	void StartSuperSpeed()
@@ -55,7 +64,7 @@ public:
 	{
 		if (y < 600)
 		{
-			y += (speed_Pizza * time) * 20;
+			y += (speed_Pizza * time);
 		}
 		if (spacePressed)
 		{
@@ -102,7 +111,7 @@ public:
 		}
 		else if (rightPressed)
 		{
-			x += (speed_Pan * time) * 25;
+			x += (speed_Pan * time) * 40;
 		}
 		if (sprite.getPosition().x < 26)
 		{
@@ -110,7 +119,7 @@ public:
 		}
 		else if (leftPressed)
 		{
-			x -= (speed_Pan * time) * 25;
+			x -= (speed_Pan * time) * 40;
 		}
 		sprite.setPosition(x+w/2, y+h/2); //задаем позицию спрайта
 	}
@@ -118,32 +127,16 @@ public:
 
 class Chef :public GameObject {
 public:
-
-	int numb[11] = { 0, 59, 118, 177, 236, 295, 354, 413, 472, 531, 590 };
-	int A = 0;
-	int B = 10;
-	int num = A + rand() % ((B + 1) - A);
-
 	Chef(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
 		if (name == "Chef") {
 			sprite.getTextureRect();
 		}
+		random_number();
 	}
 
 	void update(float time)
 	{
-		
-		x = numb[num];
-		if (sprite.getPosition().y > 35)
-		{
-			y -= (speed_Pan * time) * 10;
-			if (sprite.getPosition().y == 35)
-			{
-				y += (speed_Pan * time) * 10;
-			}
-		}
-		
 		sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
 	}
 };
@@ -167,7 +160,7 @@ void draw()
 	Image ChefImage;
 	ChefImage.loadFromFile("image/chef.bmp");
 	ChefImage.createMaskFromColor(ChefImage.getPixel(0, 0));
-	Chef chef(ChefImage, 370, 110, 50, 50, "Chef");//пицца, объект класса пицца
+	Chef chef(ChefImage, 370, 10, 50, 50, "Chef");//пицца, объект класса пицца
 
 	Image PanImage;
 	PanImage.loadFromFile("image/pan1.bmp");
@@ -179,6 +172,10 @@ void draw()
 	PizzaImage.loadFromFile("image/pizza.bmp");//загрузка изображения пиццы
 	PizzaImage.createMaskFromColor(PizzaImage.getPixel(0, 0));
 	Pizza pizza(PizzaImage, 400, 70, 50, 50, "Pizza");//пицца, объект класса пицца
+
+	list<Pizza*>  list_pizza;//создаю список, сюда буду кидать объекты.
+	list<Pizza*>::iterator it;//итератор чтобы проходить по эл-там списка
+		list_pizza.push_back(new Pizza(PizzaImage, 400, 70, 50, 50, "Pizza"));//и закидываем в список
 
 	// Переменная времени
 	Clock clock;
@@ -192,7 +189,7 @@ void draw()
 		// перезагружаем время
 		clock.restart();
 		// Переменная времени для игры
-		time = time / 2;
+		time = time / 4;
 		// Обрабатываем события в цикле
 		//Event event;
 		while (window.pollEvent(event))
@@ -243,12 +240,19 @@ void draw()
 			// Отрисовка нижней части фона, кирпичной стены.
 			window.draw(spriteBG_2);
 			// Вызов функций обновления спрайтов.
+			//pizza.update(time);
+			for (it = list_pizza.begin(); it != list_pizza.end(); it++)		//для всех элементов списка активируем ф-цию update
+			{
+				(*it)->update(time);
+			}
 			chef.update(time);
-			pizza.update(time);
 			pan.update(time);
 
 			// Отрисовка спрайта пиццы и сковороды.
-			window.draw(pizza.sprite);
+			for (it = list_pizza.begin(); it != list_pizza.end(); it++)
+			{
+				window.draw((*it)->sprite); //рисуем list_pizza объекты
+			}
 			window.draw(pan.sprite);
 			// Отрисовка окна
 			window.display();

@@ -14,12 +14,12 @@ public:
 	int numb[11] = { 0, 59, 118, 177, 236, 295, 354, 413, 472, 531, 590 };
 	int A = 0; int B = 10; int num;
 	float  x, y, speed_Pan, speed_Pizza, moveTimer;//добавили переменную таймер для будущих целей
-	int w, h;
+	float w, h;
 	Texture texture;
 	Sprite sprite;
 	String name;
 
-	GameObject (Image& image, float X, float Y, int W, int H, String Name)
+	GameObject (Image& image, float X, float Y, float W, float H, String Name)
 	{
 		x = X; y = Y; w = W; h = H; moveTimer = 0; name = Name;
 		speed_Pan = 20;
@@ -40,10 +40,10 @@ public:
 
 class Pizza :public GameObject {
 public:
-	double superSpeed = 40;
-	bool spacePressed;
+	float superSpeed = 40;
+	bool spacePressed, delete_pizza = false;
 	
-	Pizza(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
+	Pizza(Image& image, float X, float Y, float W, float H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
 		if (name == "Pizza") {
 			sprite.getTextureRect();
@@ -71,6 +71,10 @@ public:
 			y += (superSpeed * time) * 20;
 		}
 		sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
+		if (y >= 600)
+		{
+			delete_pizza = true;
+		}
 	}
 };
 
@@ -79,7 +83,7 @@ public:
 	bool rightPressed;
 	bool leftPressed;
 
-	Pan(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
+	Pan(Image& image, float X, float Y, float W, float H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
 		if (name == "Pan") {
 			sprite.getTextureRect();
@@ -127,7 +131,7 @@ public:
 
 class Chef :public GameObject {
 public:
-	Chef(Image& image, float X, float Y, int W, int H, String Name) :GameObject(image, X, Y, W, H, Name)
+	Chef(Image& image, float X, float Y, float W, float H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
 		if (name == "Chef") {
 			sprite.getTextureRect();
@@ -174,7 +178,7 @@ void draw()
 	Pizza pizza(PizzaImage, 400, 70, 50, 50, "Pizza");//пицца, объект класса пицца
 
 	list<Pizza*>  list_pizza;//создаю список, сюда буду кидать объекты.
-	list<Pizza*>::iterator it;//итератор чтобы проходить по эл-там списка
+	list<Pizza*>::iterator it_piz;//итератор чтобы проходить по эл-там списка
 		list_pizza.push_back(new Pizza(PizzaImage, 400, 70, 50, 50, "Pizza"));//и закидываем в список
 
 	// Переменная времени
@@ -240,18 +244,28 @@ void draw()
 			// Отрисовка нижней части фона, кирпичной стены.
 			window.draw(spriteBG_2);
 			// Вызов функций обновления спрайтов.
-			//pizza.update(time);
-			for (it = list_pizza.begin(); it != list_pizza.end(); it++)		//для всех элементов списка активируем ф-цию update
+			for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)		//для всех элементов списка активируем ф-цию update
 			{
-				(*it)->update(time);
+				(*it_piz)->update(time);
+				if ((*it_piz)->delete_pizza == true)
+				{
+					delete* it_piz;	// если этот объект выходит за край экрана, то удаляем его
+					it_piz = list_pizza.erase(it_piz);
+				}
+				if (it_piz == list_pizza.end())
+				{
+					break;
+				}
+				cout << *it_piz << endl;
 			}
+			
 			chef.update(time);
 			pan.update(time);
 
 			// Отрисовка спрайта пиццы и сковороды.
-			for (it = list_pizza.begin(); it != list_pizza.end(); it++)
+			for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)
 			{
-				window.draw((*it)->sprite); //рисуем list_pizza объекты
+				window.draw((*it_piz) ->sprite); //рисуем list_pizza объекты
 			}
 			window.draw(pan.sprite);
 			// Отрисовка окна
@@ -262,8 +276,8 @@ void draw()
 int main()
 {
 	srand(time(NULL));
-	HWND hConsole = GetConsoleWindow();//Если компилятор старый заменить на GetForegroundWindow()
-	ShowWindow(hConsole, SW_HIDE);//прячем окно консоли
+	//HWND hConsole = GetConsoleWindow();//Если компилятор старый заменить на GetForegroundWindow()
+	//ShowWindow(hConsole, SW_HIDE);//прячем окно консоли
 	
 	draw();
 	

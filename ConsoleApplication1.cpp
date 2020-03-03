@@ -11,8 +11,8 @@ using namespace std;
 class GameObject
 {
 public:
-	int numb[11] = { 0, 59, 118, 177, 236, 295, 354, 413, 472, 531, 590 };
-	int A = 0; int B = 10; int num;
+	int numb[11] = { 0, 75, 150, 225, 300, 375, 450, 525, 600, 675, 750 };
+	int A = 0; int B = 11; int num;
 	float  x, y, speed_Pan, speed_Pizza, moveTimer;//добавили переменную таймер для будущих целей
 	float w, h;
 	Texture texture;
@@ -22,8 +22,8 @@ public:
 	GameObject (Image& image, float X, float Y, float W, float H, String Name)
 	{
 		x = X; y = Y; w = W; h = H; moveTimer = 0; name = Name;
-		speed_Pan = 20;
-		speed_Pizza = 1;
+		speed_Pan = 30;
+		speed_Pizza = 30;
 		name = "P";
 		texture.loadFromImage(image);
 		sprite.setTexture(texture);
@@ -35,13 +35,15 @@ public:
 			int num = A + rand() % ((B + 1) - A);
 			x = numb[num];
 	}
+	FloatRect getRect() {
+		return FloatRect(x, y, w, h);
+	}
 	virtual void update(float time) = 0;
 };
 
 class Pizza :public GameObject {
 public:
-	float superSpeed = 40;
-	bool spacePressed, delete_pizza = false;
+	bool delete_pizza = false;
 	
 	Pizza(Image& image, float X, float Y, float W, float H, String Name) :GameObject(image, X, Y, W, H, Name)
 	{
@@ -51,30 +53,17 @@ public:
 		random_number();
 	}
 
-	void StartSuperSpeed()
-	{
-		spacePressed = true;
-	}
-	void StopSuperSpeed()
-	{
-		spacePressed = false;
-	}
-
 	void update(float time)
 	{
 		if (y < 600)
 		{
-			y += (speed_Pizza * time);
+			y += (speed_Pizza * time)*30;
 		}
-		if (spacePressed)
-		{
-			y += (superSpeed * time) * 20;
-		}
-		sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
 		if (y >= 600)
 		{
 			delete_pizza = true;
 		}
+		sprite.setPosition(x + w / 2, y + h / 2); //задаем позицию спрайта в место его центра
 	}
 };
 
@@ -179,7 +168,10 @@ void draw()
 
 	list<Pizza*>  list_pizza;//создаю список, сюда буду кидать объекты.
 	list<Pizza*>::iterator it_piz;//итератор чтобы проходить по эл-там списка
+	for (int i = 0; i < 5; i++)
+	{
 		list_pizza.push_back(new Pizza(PizzaImage, 400, 70, 50, 50, "Pizza"));//и закидываем в список
+	}
 
 	// Переменная времени
 	Clock clock;
@@ -226,28 +218,27 @@ void draw()
 			{
 				pan.stopRight();
 			}
-			if (Keyboard::isKeyPressed(Keyboard::Space))
-			{
-				pizza.StartSuperSpeed();
-			}
-			else
-			{
-				pizza.StopSuperSpeed();
-			}
 		}
-			// Установка цвета фона - белый
-			window.clear(Color::White);
-			// Отрисовка верхней части фона.
-			window.draw(spriteBG_1);
-			// Отрисовка Повара.
-			window.draw(chef.sprite);
-			// Отрисовка нижней части фона, кирпичной стены.
-			window.draw(spriteBG_2);
-			// Вызов функций обновления спрайтов.
-			for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)		//для всех элементов списка активируем ф-цию update
+		// Установка цвета фона - белый
+		window.clear(Color::White);
+		// Отрисовка верхней части фона.
+		window.draw(spriteBG_1);
+		// Отрисовка Повара.
+		window.draw(chef.sprite);
+		// Отрисовка нижней части фона, кирпичной стены.
+		window.draw(spriteBG_2);
+		// Вызов функций обновления спрайтов.
+		for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)		//для всех элементов списка активируем ф-цию update
+		{
+			(*it_piz)->update(time);
+			if ((*it_piz)->delete_pizza == true)
 			{
-				(*it_piz)->update(time);
-				if ((*it_piz)->delete_pizza == true)
+				delete* it_piz;	// если этот объект выходит за край экрана, то удаляем его
+				it_piz = list_pizza.erase(it_piz);
+			}
+			for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)//проходимся по эл-там списка
+			{
+				if ((*it_piz)->getRect().intersects(pan.getRect()))//если прямоугольник спрайта объекта пересекается с игроком
 				{
 					delete* it_piz;	// если этот объект выходит за край экрана, то удаляем его
 					it_piz = list_pizza.erase(it_piz);
@@ -256,22 +247,28 @@ void draw()
 				{
 					break;
 				}
-				cout << *it_piz << endl;
+			}
+			if (it_piz == list_pizza.end())
+			{
+				break;
 			}
 			
+		}
+
 			chef.update(time);
 			pan.update(time);
 
 			// Отрисовка спрайта пиццы и сковороды.
 			for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)
 			{
-				window.draw((*it_piz) ->sprite); //рисуем list_pizza объекты
+				window.draw((*it_piz)->sprite); //рисуем list_pizza объекты
 			}
 			window.draw(pan.sprite);
 			// Отрисовка окна
 			window.display();
 	}
 }
+
 
 int main()
 {

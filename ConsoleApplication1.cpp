@@ -11,8 +11,6 @@ using namespace std;
 class GameObject
 {
 public:
-	int numb[11] = { 0, 75, 150, 225, 300, 375, 450, 525, 600, 675, 750 };
-	int A = 0; int B = 11; int num;
 	float  x, y, speed_Pan, speed_Pizza, moveTimer;//добавили переменную таймер для будущих целей
 	float w, h;
 	Texture texture;
@@ -29,11 +27,12 @@ public:
 		sprite.setTexture(texture);
 		sprite.setOrigin(w/2, h/2);
 	}
-
 	void random_number()
 	{
-			int num = A + rand() % ((B + 1) - A);
-			x = numb[num];
+		int numb[11] = { 0, 75, 150, 225, 300, 375, 450, 525, 600, 675, 750 };
+		int A = 0; int B = 11; int num;
+		int num = A + rand() % ((B + 1) - A);
+		x = numb[num];
 	}
 	FloatRect getRect() {
 		return FloatRect(x, y, w, h);
@@ -124,8 +123,8 @@ public:
 	{
 		if (name == "Chef") {
 			sprite.getTextureRect();
+			random_number();
 		}
-		random_number();
 	}
 
 	void update(float time)
@@ -153,7 +152,7 @@ void draw()
 	Image ChefImage;
 	ChefImage.loadFromFile("image/chef.bmp");
 	ChefImage.createMaskFromColor(ChefImage.getPixel(0, 0));
-	Chef chef(ChefImage, 370, 10, 50, 50, "Chef");//пицца, объект класса пицца
+	Chef chef(ChefImage, 0, 10, 50, 50, "Chef");//пицца, объект класса пицца
 
 	Image PanImage;
 	PanImage.loadFromFile("image/pan1.bmp");
@@ -164,13 +163,14 @@ void draw()
 	Image PizzaImage;
 	PizzaImage.loadFromFile("image/pizza.bmp");//загрузка изображения пиццы
 	PizzaImage.createMaskFromColor(PizzaImage.getPixel(0, 0));
-	Pizza pizza(PizzaImage, 400, 70, 50, 50, "Pizza");//пицца, объект класса пицца
+	Pizza pizza(PizzaImage, 0, 70, 50, 50, "Pizza");//пицца, объект класса пицца
 
 	list<Pizza*>  list_pizza;//создаю список, сюда буду кидать объекты.
-	list<Pizza*>::iterator it_piz;//итератор чтобы проходить по эл-там списка
+	list<Pizza*>::iterator it_pizza;//итератор чтобы проходить по эл-там списка
+	// Добавляем через цикл i-тое количество пицц.
 	for (int i = 0; i < 5; i++)
 	{
-		list_pizza.push_back(new Pizza(PizzaImage, 400, 70, 50, 50, "Pizza"));//и закидываем в список
+		list_pizza.push_back(new Pizza(PizzaImage, 0, 70, 50, 50, "Pizza"));//и закидываем в список
 	}
 
 	// Переменная времени
@@ -228,47 +228,45 @@ void draw()
 		// Отрисовка нижней части фона, кирпичной стены.
 		window.draw(spriteBG_2);
 		// Вызов функций обновления спрайтов.
-		for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)		//для всех элементов списка активируем ф-цию update
+		for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)		
 		{
-			(*it_piz)->update(time);
-			if ((*it_piz)->delete_pizza == true)
+			(*it_pizza)->update(time);	//для всех элементов списка активируем ф-цию update
+			if ((*it_pizza)->delete_pizza == true)
 			{
-				delete* it_piz;	// если этот объект выходит за край экрана, то удаляем его
-				it_piz = list_pizza.erase(it_piz);
+				delete* it_pizza;	// если этот объект выходит за край экрана, то удаляем его
+				it_pizza = list_pizza.erase(it_pizza);
 			}
-			for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)//проходимся по эл-там списка
+			for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)//проходимся по эл-там списка
 			{
-				if ((*it_piz)->getRect().intersects(pan.getRect()))//если прямоугольник спрайта объекта пересекается с игроком
+				if ((*it_pizza)->getRect().intersects(pan.getRect()))//если прямоугольник спрайта объекта пересекается с сковородой
 				{
-					delete* it_piz;	// если этот объект выходит за край экрана, то удаляем его
-					it_piz = list_pizza.erase(it_piz);
+					delete* it_pizza;	// то удаляем его
+					it_pizza = list_pizza.erase(it_pizza);
 				}
-				if (it_piz == list_pizza.end())
+				if (it_pizza == list_pizza.end())
 				{
 					break;
 				}
 			}
-			if (it_piz == list_pizza.end())
+			if (it_pizza == list_pizza.end())
 			{
 				break;
 			}
 			
 		}
+		chef.update(time);
+		pan.update(time);
 
-			chef.update(time);
-			pan.update(time);
-
-			// Отрисовка спрайта пиццы и сковороды.
-			for (it_piz = list_pizza.begin(); it_piz != list_pizza.end(); it_piz++)
-			{
-				window.draw((*it_piz)->sprite); //рисуем list_pizza объекты
-			}
-			window.draw(pan.sprite);
-			// Отрисовка окна
-			window.display();
+		// Отрисовка спрайта пиццы и сковороды.
+		for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)
+		{
+			window.draw((*it_pizza)->sprite); //рисуем list_pizza объекты
+		}
+		window.draw(pan.sprite);
+		// Отрисовка окна
+		window.display();
 	}
 }
-
 
 int main()
 {

@@ -4,15 +4,17 @@
 #include <ctime>
 #include <iostream>
 #include <cstdlib>
+#include <sstream>
 using namespace sf;
 using namespace std;
-
 
 class GameObject
 {
 public:
+	
 	float  x, y, speed_Pan, speed_Pizza, moveTimer;//добавили переменную таймер для будущих целей
 	float w, h;
+	int score;
 	Texture texture;
 	Sprite sprite;
 	String name;
@@ -22,18 +24,13 @@ public:
 		x = X; y = Y; w = W; h = H; moveTimer = 0; name = Name;
 		speed_Pan = 30;
 		speed_Pizza = 30;
+		score = 0;
 		name = "P";
 		texture.loadFromImage(image);
 		sprite.setTexture(texture);
 		sprite.setOrigin(w/2, h/2);
 	}
-	void random_number()
-	{
-		int numb[11] = { 0, 75, 150, 225, 300, 375, 450, 525, 600, 675, 750 };
-		int A = 0; int B = 11; int num;
-		int num = A + rand() % ((B + 1) - A);
-		x = numb[num];
-	}
+	
 	FloatRect getRect() {
 		return FloatRect(x, y, w, h);
 	}
@@ -42,6 +39,8 @@ public:
 
 class Pizza :public GameObject {
 public:
+	int numb[11] = { 0, 75, 150, 225, 300, 375, 450, 525, 600, 675, 750 };
+	int A = 0; int B = 11; int num;
 	bool delete_pizza = false;
 	
 	Pizza(Image& image, float X, float Y, float W, float H, String Name) :GameObject(image, X, Y, W, H, Name)
@@ -50,6 +49,11 @@ public:
 			sprite.getTextureRect();
 		}
 		random_number();
+	}
+	void random_number()
+	{
+		int num = A + rand() % ((B + 1) - A);
+		x = numb[num];
 	}
 
 	void update(float time)
@@ -117,13 +121,12 @@ public:
 	}
 };
 
-class Chef :public GameObject {
+class Chef :public Pizza {
 public:
-	Chef(Image& image, float X, float Y, float W, float H, String Name) :GameObject(image, X, Y, W, H, Name)
+	Chef(Image& image, float X, float Y, float W, float H, String Name) :Pizza(image, X, Y, W, H, Name)
 	{
 		if (name == "Chef") {
 			sprite.getTextureRect();
-			random_number();
 		}
 	}
 
@@ -164,6 +167,12 @@ void draw()
 	PizzaImage.loadFromFile("image/pizza.bmp");//загрузка изображения пиццы
 	PizzaImage.createMaskFromColor(PizzaImage.getPixel(0, 0));
 	Pizza pizza(PizzaImage, 0, 70, 50, 50, "Pizza");//пицца, объект класса пицца
+
+	Font font;//шрифт 
+	font.loadFromFile("fonts/CyrilicOld.ttf");//передаем нашему шрифту файл шрифта
+	Text text("", font, 25);//создаем объект текст. закидываем в объект текст строку, шрифт, размер шрифта(в пикселях);//сам объект текст (не строка)
+	text.setFillColor(Color::Red);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
+	text.setStyle(Text::Bold | Text::Underlined);//жирный и подчеркнутый текст. по умолчанию он "худой":)) и не подчеркнутый
 
 	list<Pizza*>  list_pizza;//создаю список, сюда буду кидать объекты.
 	list<Pizza*>::iterator it_pizza;//итератор чтобы проходить по эл-там списка
@@ -233,6 +242,7 @@ void draw()
 			(*it_pizza)->update(time);	//для всех элементов списка активируем ф-цию update
 			if ((*it_pizza)->delete_pizza == true)
 			{
+				chef.random_number();
 				delete* it_pizza;	// если этот объект выходит за край экрана, то удаляем его
 				it_pizza = list_pizza.erase(it_pizza);
 			}
@@ -240,8 +250,11 @@ void draw()
 			{
 				if ((*it_pizza)->getRect().intersects(pan.getRect()))//если прямоугольник спрайта объекта пересекается с сковородой
 				{
+					chef.random_number();
 					delete* it_pizza;	// то удаляем его
 					it_pizza = list_pizza.erase(it_pizza);
+					pizza.score++;
+					cout << pizza.score << endl;
 				}
 				if (it_pizza == list_pizza.end())
 				{
@@ -256,6 +269,12 @@ void draw()
 		}
 		chef.update(time);
 		pan.update(time);
+
+		ostringstream playerScoreString;    // объявили переменную
+		playerScoreString << pizza.score*10;		//занесли в нее число очков,
+		text.setString("Получено очков: " + playerScoreString.str());//задает строку тексту
+		text.setPosition(570, 0);//задаем позицию текста, центр камеры
+		window.draw(text);//рисую этот текст
 
 		// Отрисовка спрайта пиццы и сковороды.
 		for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)

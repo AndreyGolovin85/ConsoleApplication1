@@ -138,6 +138,7 @@ public:
 
 void draw()
 {
+	int count;
 	// Объект, который, собственно, является главным окном приложения
 	RenderWindow window(VideoMode(800, 600), "Panic in the Pizzeria");
 	Image imageBG_1, imageBG_2;
@@ -170,14 +171,19 @@ void draw()
 
 	Font font;//шрифт 
 	font.loadFromFile("fonts/CyrilicOld.ttf");//передаем нашему шрифту файл шрифта
-	Text text("", font, 25);//создаем объект текст. закидываем в объект текст строку, шрифт, размер шрифта(в пикселях);//сам объект текст (не строка)
-	text.setFillColor(Color::Red);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
-	text.setStyle(Text::Bold | Text::Underlined);//жирный и подчеркнутый текст. по умолчанию он "худой":)) и не подчеркнутый
+	Text textScore("", font, 25);//создаем объект текст. закидываем в объект текст строку, шрифт, размер шрифта(в пикселях);//сам объект текст (не строка)
+	Text textPizza("", font, 25);
+	textScore.setFillColor(Color::Cyan);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
+	textPizza.setFillColor(Color::Cyan);
+	textScore.setStyle(Text::Bold);//жирный и подчеркнутый текст. по умолчанию он "худой":)) и не подчеркнутый
+	textPizza.setStyle(Text::Bold);
+	textScore.setPosition(680, 0);//задаем позицию текста, центр камеры
+	textPizza.setPosition(10, 0);
 
 	list<Pizza*>  list_pizza;//создаю список, сюда буду кидать объекты.
 	list<Pizza*>::iterator it_pizza;//итератор чтобы проходить по эл-там списка
 	// Добавляем через цикл i-тое количество пицц.
-	for (int i = 0; i < 5; i++)
+	for (count = 0; count < 5; count++)
 	{
 		list_pizza.push_back(new Pizza(PizzaImage, 0, 70, 50, 50, "Pizza"));//и закидываем в список
 	}
@@ -245,6 +251,7 @@ void draw()
 				chef.random_number();
 				delete* it_pizza;	// если этот объект выходит за край экрана, то удаляем его
 				it_pizza = list_pizza.erase(it_pizza);
+				count--;
 			}
 			for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)//проходимся по эл-там списка
 			{
@@ -254,6 +261,7 @@ void draw()
 					delete* it_pizza;	// то удаляем его
 					it_pizza = list_pizza.erase(it_pizza);
 					pizza.score++;
+					count--;
 					cout << pizza.score << endl;
 				}
 				if (it_pizza == list_pizza.end())
@@ -270,11 +278,13 @@ void draw()
 		chef.update(time);
 		pan.update(time);
 
-		ostringstream playerScoreString;    // объявили переменную
-		playerScoreString << pizza.score*10;		//занесли в нее число очков,
-		text.setString("Получено очков: " + playerScoreString.str());//задает строку тексту
-		text.setPosition(570, 0);//задаем позицию текста, центр камеры
-		window.draw(text);//рисую этот текст
+		ostringstream ScoreString, PizzaString;    // объявили переменную
+		ScoreString << pizza.score*10;		//занесли в нее число очков
+		PizzaString << count;
+		textScore.setString("Получено\n очков: " + ScoreString.str());//задает строку тексту
+		textPizza.setString("Пиццы\n осталось: " + PizzaString.str());
+		window.draw(textScore);//рисую этот текст
+		window.draw(textPizza);
 
 		// Отрисовка спрайта пиццы и сковороды.
 		for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)

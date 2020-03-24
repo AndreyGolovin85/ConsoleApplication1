@@ -136,11 +136,128 @@ public:
 	}
 };
 
-void draw()
+void menu(RenderWindow& window, Event& event)
+{
+	Texture menuTexture1, menuTexture2, menuTexture3, menuTexture4, aboutTexture, menuBackground;
+	menuTexture1.loadFromFile("image/new_game.png");
+	menuTexture2.loadFromFile("image/about_game.png");
+	menuTexture3.loadFromFile("image/help.png");
+	menuTexture4.loadFromFile("image/exit_game.png");
+	aboutTexture.loadFromFile("image/about.bmp");
+	menuBackground.loadFromFile("image/wall.jpg");
+	Sprite new_game(menuTexture1), about_game(menuTexture2), help_game(menuTexture3),
+		exit_game(menuTexture4), about(aboutTexture), background(menuBackground);
+	bool isMenu = 1;
+	int menuNum = 0;
+	new_game.setPosition(300, 30);
+	about_game.setPosition(280, 90);
+	help_game.setPosition(300, 150);
+	exit_game.setPosition(330, 210);
+	background.setPosition(0, 0);
+
+	//МЕНЮ//
+	while (isMenu)
+	{
+		menuNum = 0;
+		new_game.setColor(Color::White);
+		about_game.setColor(Color::White);
+		help_game.setColor(Color::White);
+		exit_game.setColor(Color::White);
+		window.clear(Color::White);
+
+		if (IntRect(300, 30, 300, 50).contains(Mouse::getPosition(window)))
+		{
+			new_game.setColor(Color::Blue);
+			menuNum = 1;
+		}
+		if (IntRect(280, 90, 300, 50).contains(Mouse::getPosition(window)))
+		{
+			about_game.setColor(Color::Blue);
+			menuNum = 2;
+		}
+		if (IntRect(330, 150, 300, 50).contains(Mouse::getPosition(window)))
+		{
+			help_game.setColor(Color::Blue);
+			menuNum = 3;
+		}
+
+		if (IntRect(300, 210, 300, 50).contains(Mouse::getPosition(window)))
+		{
+			exit_game.setColor(Color::Blue);
+			menuNum = 4;
+		}
+
+		if (Mouse::isButtonPressed(Mouse::Left))
+		{
+			if (menuNum == 1)
+			{
+				isMenu = false;   //если нажали первую кнопку, то выходим из меню 
+			}
+			if (menuNum == 2)
+			{
+				window.draw(about);
+				window.display();
+				while (!Keyboard::isKeyPressed(Keyboard::Escape));
+			}
+			if (menuNum == 4)
+			{
+				window.close();
+				isMenu = false;
+			}
+		}
+
+		window.draw(background);
+		window.draw(new_game);
+		window.draw(about_game);
+		window.draw(help_game);
+		window.draw(exit_game);
+		window.display();
+	}
+}
+
+
+void input(RenderWindow & window, Event & event, Pan & pan)
+{
+	while (window.pollEvent(event))
+	{
+		// Пользователь нажал на «крестик» и хочет закрыть окно?
+		if (event.type == Event::Closed)
+		{
+			// тогда закрываем его
+			window.close();
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Q))
+		{
+			window.close();
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Escape))
+		{
+			menu(window, event);
+		}
+		// Обрабатываем нажатие клавиш движения
+		if (Keyboard::isKeyPressed(Keyboard::Left))
+		{
+			pan.moveLeft();
+		}
+		else
+		{
+			pan.stopLeft();
+		}
+		if (Keyboard::isKeyPressed(Keyboard::Right))
+		{
+			pan.moveRight();
+		}
+		else
+		{
+			pan.stopRight();
+		}
+	}
+}
+
+void draw(RenderWindow& window, Event& event)
 {
 	int count;
-	// Объект, который, собственно, является главным окном приложения
-	RenderWindow window(VideoMode(800, 600), "Panic in the Pizzeria");
+	
 	Image imageBG_1, imageBG_2;
 	Texture textureBG_1, textureBG_2;
 	Sprite spriteBG_1, spriteBG_2;
@@ -173,8 +290,8 @@ void draw()
 	font.loadFromFile("fonts/CyrilicOld.ttf");//передаем нашему шрифту файл шрифта
 	Text textScore("", font, 25);//создаем объект текст. закидываем в объект текст строку, шрифт, размер шрифта(в пикселях);//сам объект текст (не строка)
 	Text textPizza("", font, 25);
-	textScore.setFillColor(Color::Cyan);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
-	textPizza.setFillColor(Color::Cyan);
+	textScore.setFillColor(Color::Blue);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
+	textPizza.setFillColor(Color::Blue);
 	textScore.setStyle(Text::Bold);//жирный и подчеркнутый текст. по умолчанию он "худой":)) и не подчеркнутый
 	textPizza.setStyle(Text::Bold);
 	textScore.setPosition(680, 0);//задаем позицию текста, центр камеры
@@ -190,50 +307,20 @@ void draw()
 
 	// Переменная времени
 	Clock clock;
-	// Инициализация Event.
-	Event event;
+
 	// Главный цикл приложения: выполняется, пока открыто окно
 	while (window.isOpen())
 	{
+		// Вызываем функцию обработки ввода.
+		input(window, event, pan);
+
 		// Дать прошедшее время в секундах
 		float time = clock.getElapsedTime().asSeconds();
 		// перезагружаем время
 		clock.restart();
 		// Переменная времени для игры
 		time = time / 4;
-		// Обрабатываем события в цикле
-		//Event event;
-		while (window.pollEvent(event))
-		{
 
-			// Пользователь нажал на «крестик» и хочет закрыть окно?
-			if (event.type == Event::Closed)
-			{
-				// тогда закрываем его
-				window.close();
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Escape))
-			{
-				window.close();
-			}
-			// Обрабатываем нажатие клавиш движения
-			if (Keyboard::isKeyPressed(Keyboard::Left))
-			{
-				pan.moveLeft();
-			}
-			else
-			{
-				pan.stopLeft();
-			}
-			if (Keyboard::isKeyPressed(Keyboard::Right))
-			{
-				pan.moveRight();
-			}
-			else
-			{
-				pan.stopRight();
-			}
-		}
 		// Установка цвета фона - белый
 		window.clear(Color::White);
 		// Отрисовка верхней части фона.
@@ -281,8 +368,8 @@ void draw()
 		ostringstream ScoreString, PizzaString;    // объявили переменную
 		ScoreString << pizza.score*10;		//занесли в нее число очков
 		PizzaString << count;
-		textScore.setString("Получено\n очков: " + ScoreString.str());//задает строку тексту
-		textPizza.setString("Пиццы\n осталось: " + PizzaString.str());
+		textScore.setString("Очки: " +ScoreString.str());//задает строку тексту
+		textPizza.setString("Пиццы: " + PizzaString.str());
 		window.draw(textScore);//рисую этот текст
 		window.draw(textPizza);
 
@@ -302,8 +389,12 @@ int main()
 	srand(time(NULL));
 	//HWND hConsole = GetConsoleWindow();//Если компилятор старый заменить на GetForegroundWindow()
 	//ShowWindow(hConsole, SW_HIDE);//прячем окно консоли
-	
-	draw();
+
+	// Объект, который, собственно, является главным окном приложения
+	RenderWindow window(VideoMode(800, 600), "Panic in the Pizzeria");
+	Event event;
+	menu(window, event);
+	draw(window, event);
 	
 	return 0;
 }

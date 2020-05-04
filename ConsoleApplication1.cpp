@@ -19,13 +19,12 @@ public:
 	Sprite sprite;
 	String name;
 
-	GameObject (Image& image, float X, float Y, float W, float H, String Name)
+	GameObject (Image& image, float X, float Y, float W, float H)
 	{
-		x = X; y = Y; w = W; h = H; moveTimer = 0; name = Name;
+		x = X; y = Y; w = W; h = H; moveTimer = 0;
 		speed_Pan = 30;
 		speed_Pizza = 30;
 		score = 0;
-		name = "P";
 		texture.loadFromImage(image);
 		sprite.setTexture(texture);
 		sprite.setOrigin(w/2, h/2);
@@ -43,13 +42,14 @@ public:
 	int A = 0; int B = 11; int num;
 	bool delete_pizza = false;
 	
-	Pizza(Image& image, float X, float Y, float W, float H, String Name) :GameObject(image, X, Y, W, H, Name)
+	Pizza(Image& image, float X, float Y, float W, float H) :GameObject(image, X, Y, W, H)
 	{
-		if (name == "Pizza") {
-			sprite.getTextureRect();
-		}
+		 
+		sprite.getTextureRect();
+		
 		random_number();
 	}
+
 	void random_number()
 	{
 		int num = A + rand() % ((B + 1) - A);
@@ -60,7 +60,7 @@ public:
 	{
 		if (y < 600)
 		{
-			y += (speed_Pizza * time)*30;
+			y += (speed_Pizza * time) * 30;
 		}
 		if (y >= 600)
 		{
@@ -75,11 +75,9 @@ public:
 	bool rightPressed;
 	bool leftPressed;
 
-	Pan(Image& image, float X, float Y, float W, float H, String Name) :GameObject(image, X, Y, W, H, Name)
+	Pan(Image& image, float X, float Y, float W, float H) :GameObject(image, X, Y, W, H)
 	{
-		if (name == "Pan") {
-			sprite.getTextureRect();
-		}
+		sprite.getTextureRect();
 	}
 	// Функции движения спрайта с флагом true/false.
 	void moveRight()
@@ -123,11 +121,10 @@ public:
 
 class Chef :public Pizza {
 public:
-	Chef(Image& image, float X, float Y, float W, float H, String Name) :Pizza(image, X, Y, W, H, Name)
+	Chef(Image& image, float X, float Y, float W, float H) :Pizza(image, X, Y, W, H)
 	{
-		if (name == "Chef") {
-			sprite.getTextureRect();
-		}
+		sprite.getTextureRect();
+		random_number();
 	}
 
 	void update(float time)
@@ -147,7 +144,7 @@ void menu(RenderWindow& window, Event& event)
 	menuBackground.loadFromFile("image/wall.jpg");
 	Sprite new_game(menuTexture1), about_game(menuTexture2), help_game(menuTexture3),
 		exit_game(menuTexture4), about(aboutTexture), background(menuBackground);
-	bool isMenu = 1;
+	bool isMenu = true;
 	int menuNum = 0;
 	new_game.setPosition(300, 30);
 	about_game.setPosition(280, 90);
@@ -215,7 +212,6 @@ void menu(RenderWindow& window, Event& event)
 	}
 }
 
-
 void input(RenderWindow & window, Event & event, Pan & pan)
 {
 	while (window.pollEvent(event))
@@ -257,7 +253,9 @@ void input(RenderWindow & window, Event & event, Pan & pan)
 void draw(RenderWindow& window, Event& event)
 {
 	int count;
-	
+	// Переменная времени
+	Clock clock;
+
 	Image imageBG_1, imageBG_2;
 	Texture textureBG_1, textureBG_2;
 	Sprite spriteBG_1, spriteBG_2;
@@ -273,28 +271,28 @@ void draw(RenderWindow& window, Event& event)
 	Image ChefImage;
 	ChefImage.loadFromFile("image/chef.bmp");
 	ChefImage.createMaskFromColor(ChefImage.getPixel(0, 0));
-	Chef chef(ChefImage, 0, 10, 50, 50, "Chef");//пицца, объект класса пицца
+	Chef chef(ChefImage, 0, 10, 50, 50);//пицца, объект класса повара
 
 	Image PanImage;
 	PanImage.loadFromFile("image/pan1.bmp");
 	PanImage.createMaskFromColor(PanImage.getPixel(0, 0));
-	Pan pan(PanImage, 400, 551, 50, 50, "Pan");//пицца, объект класса пицца
+	Pan pan(PanImage, 400, 551, 50, 50);//пицца, объект класса пицца
 
 	// Загружаем нашу картинку для пиццы.
 	Image PizzaImage;
 	PizzaImage.loadFromFile("image/pizza.bmp");//загрузка изображения пиццы
 	PizzaImage.createMaskFromColor(PizzaImage.getPixel(0, 0));
-	Pizza pizza(PizzaImage, 0, 70, 50, 50, "Pizza");//пицца, объект класса пицца
+	Pizza pizza(PizzaImage, 0, 70, 50, 50);//пицца, объект класса пицца
 
 	Font font;//шрифт 
 	font.loadFromFile("fonts/CyrilicOld.ttf");//передаем нашему шрифту файл шрифта
 	Text textScore("", font, 25);//создаем объект текст. закидываем в объект текст строку, шрифт, размер шрифта(в пикселях);//сам объект текст (не строка)
 	Text textPizza("", font, 25);
-	textScore.setFillColor(Color::Blue);//покрасили текст в красный. если убрать эту строку, то по умолчанию он белый
+	textScore.setFillColor(Color::Blue);//покрасили текст в синий. если убрать эту строку, то по умолчанию он белый
 	textPizza.setFillColor(Color::Blue);
-	textScore.setStyle(Text::Bold);//жирный и подчеркнутый текст. по умолчанию он "худой":)) и не подчеркнутый
+	textScore.setStyle(Text::Bold);//жирный и подчеркнутый текст. по умолчанию он "худой" и не подчеркнутый
 	textPizza.setStyle(Text::Bold);
-	textScore.setPosition(680, 0);//задаем позицию текста, центр камеры
+	textScore.setPosition(680, 0);//задаем позицию текста
 	textPizza.setPosition(10, 0);
 
 	list<Pizza*>  list_pizza;//создаю список, сюда буду кидать объекты.
@@ -302,18 +300,12 @@ void draw(RenderWindow& window, Event& event)
 	// Добавляем через цикл i-тое количество пицц.
 	for (count = 0; count < 5; count++)
 	{
-		list_pizza.push_back(new Pizza(PizzaImage, 0, 70, 50, 50, "Pizza"));//и закидываем в список
+		list_pizza.push_back(new Pizza(PizzaImage, 100, 70, 50, 50));//и закидываем в список
 	}
-
-	// Переменная времени
-	Clock clock;
 
 	// Главный цикл приложения: выполняется, пока открыто окно
 	while (window.isOpen())
 	{
-		// Вызываем функцию обработки ввода.
-		input(window, event, pan);
-
 		// Дать прошедшее время в секундах
 		float time = clock.getElapsedTime().asSeconds();
 		// перезагружаем время
@@ -330,12 +322,12 @@ void draw(RenderWindow& window, Event& event)
 		// Отрисовка нижней части фона, кирпичной стены.
 		window.draw(spriteBG_2);
 		// Вызов функций обновления спрайтов.
-		for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)		
+
+		for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)
 		{
 			(*it_pizza)->update(time);	//для всех элементов списка активируем ф-цию update
 			if ((*it_pizza)->delete_pizza == true)
 			{
-				chef.random_number();
 				delete* it_pizza;	// если этот объект выходит за край экрана, то удаляем его
 				it_pizza = list_pizza.erase(it_pizza);
 				count--;
@@ -360,18 +352,20 @@ void draw(RenderWindow& window, Event& event)
 			{
 				break;
 			}
-			
 		}
 		chef.update(time);
 		pan.update(time);
 
 		ostringstream ScoreString, PizzaString;    // объявили переменную
-		ScoreString << pizza.score*10;		//занесли в нее число очков
+		ScoreString << pizza.score * 10;		//занесли в нее число очков
 		PizzaString << count;
-		textScore.setString("Очки: " +ScoreString.str());//задает строку тексту
+		textScore.setString("Очки: " + ScoreString.str());//задает строку тексту
 		textPizza.setString("Пиццы: " + PizzaString.str());
 		window.draw(textScore);//рисую этот текст
 		window.draw(textPizza);
+
+		// Вызываем функцию обработки ввода.
+		input(window, event, pan);
 
 		// Отрисовка спрайта пиццы и сковороды.
 		for (it_pizza = list_pizza.begin(); it_pizza != list_pizza.end(); it_pizza++)
@@ -384,7 +378,7 @@ void draw(RenderWindow& window, Event& event)
 	}
 }
 
-int main()
+int main(Pan& pan)
 {
 	srand(time(NULL));
 	//HWND hConsole = GetConsoleWindow();//Если компилятор старый заменить на GetForegroundWindow()
@@ -395,6 +389,6 @@ int main()
 	Event event;
 	menu(window, event);
 	draw(window, event);
-	
+
 	return 0;
 }
